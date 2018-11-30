@@ -1,0 +1,74 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+def siteUrl = 'https://github.com/aoshiwenrou/NewsWithKotlin'  // 项目的主页
+def gitUrl = 'https://github.com/aoshiwenrou/NewsWithKotlin.git'  // Git仓库的url
+
+group = 'com.lx.baselibrary'  // 一般写唯一的包名
+version = '0.0.1'  // 版本号
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'bottom tabbar for android'  //项目描述
+                url siteUrl
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {  //填写的一些基本信息
+                        id 'xiao'
+                        name 'Xiao.Li'
+                        email '2481915077@qq.com'
+                    }
+                }
+
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+
+        }
+    }
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        version {
+            name = '1.0.0'
+            desc = 'bottom tabbar bar 1.0.0'
+        }
+        repo = 'base_remote_maven'    // bintray上创建的仓库名，我这用的maven
+        name = 'bottom-tabbar'  //发布到JCenter上的项目名字
+        licenses = ['Apache-2.0']
+        vcsUrl = gitUrl
+        publish = true
+    }
+}
